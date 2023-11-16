@@ -79,9 +79,96 @@ flowchart LR
   c4(Loop) --> UI
 
   style brains fill:#ffa500,stroke:#FF5733
-  style Router fill:#ffa500,stroke:#FF5733 
+  style Router fill:#ffa500,stroke:#FF5733
+```
 
+```javascript
+// the internals
+var outside, stat, hvac_state;
+var nest_temp, nest_mode;
+var minisplit_temp, minisplit_mode;
 
+// the inputs
+var temp = msg.payload["target_temperature"]; 
+var mode = msg.payload["hvac_mode"];
+var bias = flow.get("bias");
+var source = msg.payload["source"];
+
+// the outputs
+var lock = {};
+var nest = {};          // heat or cool only
+var minisplit = {};     // heat, cool or off
+var generic = {};       // heat or cool only
+var loop = {};          // original message with new topic
+
+// the clever bits
+if (source == "UI") {  // change the source lock
+    //node.warn("UI");    
+    lock.payload = "UI";
+    } else if (source == "loop") {
+    //node.warn("loop");
+    lock.payload = "loop";
+    } else {
+    //node.warn("brains");
+    lock.payload = "brains";
+    }
+
+if (temp > flow.get("temp_bed")) {
+    hvac_state = "heating";
+} else {
+    hvac_state = "off";
+}
+
+nest_temp = temp + bias;
+minisplit_temp = temp - bias;
+nest_mode = "heat";
+minisplit_mode = mode;
+
+nest.payload = {
+    data: {
+        "temperature": nest_temp,
+        "hvac_mode": nest_mode
+        }
+    };
+
+if (minisplit_mode == "off") {
+    minisplit.payload = {
+        service: "turn_off",
+        data: "off"
+    };
+} else {
+    minisplit.payload = {
+        service: "set_temperature",
+        data: {
+            "temperature": minisplit_temp,
+            "hvac_mode": minisplit_mode,
+
+        }
+    };
+}
+
+generic.payload = {
+    data : {
+        "temperature": nest_temp,
+        "hvac_mode": nest_mode
+        }
+    }
+
+loop.payload = {
+    "ambient_temperature": flow.get("temp_bed"),
+    "target_temperature": msg.payload["target_temperature"],
+    "hvac_state": hvac_state,
+    "hvac_mode": msg.payload["hvac_mode"],
+    "has_leaf": msg.payload["has_leaf"],
+    "away": false,
+    "source": "loop"
+    }
+
+flow.set("bed_last", loop.payload ); // used for reinjecting when on lock
+
+stat = "nest: "+ nest_temp+ " / msp: "+ minisplit_temp;
+node.status({ fill: "green", shape: "dot", text: stat });
+return [lock, nest, minisplit, generic, loop];
 ```
 
 ## Bias Mode
