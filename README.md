@@ -9,6 +9,8 @@ Whatever the scenario, evening and overnight are the same. Office only needs hea
 
 **This all started as our Gen-1 Nest Thermostats now have dead batteries and lose connectivity all the time.** I want to use multiple sensors in each zone to control the boiler, and have the Nest be a dumb input into the system, permanently wired to the 24v transformer and not control anything directly.
 
+Originally this was all done in Home Assistant with some automations and scripts, but then I discovered Node-RED and it seemed to offer better control. This is my first Node-Red project, so it's probably not the best way of doing everything, but it works.
+
 ## Home Assitant Scheduling and Zone Climate Control
 
 ### Schedule
