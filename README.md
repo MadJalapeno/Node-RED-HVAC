@@ -1,4 +1,4 @@
-# Node-RED-HVAC
+# Node-RED Multizone/Multidevice HVAC Control
 Combination of Home Assistant and Node-RED to control our complicated home HVAC.
 
 - We have 3 zones - den, upstairs and office
@@ -68,7 +68,13 @@ The 'Router' function is now the one doing all the hard work, splitting the inpu
 Title
 ---
 flowchart LR
-  id1(input temp) --> brains
+  tod(Time Of Day) --> t1
+  tod -.-> t2 & t3 & t4 & t5
+  t1(early temp) --> brains
+  t2(morning temp) -.-> brains
+  t3(afternoon temp) -.-> brains
+  t4(evening temp) -.-> brains
+  t5(overnight temp) -.-> brains
   id2(outside temp) --> brains
   brains(brains inside/outside) --> UI
   UI(Nest UI) --> Router
