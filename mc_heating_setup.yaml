@@ -1,0 +1,249 @@
+# Trying to control the heating
+#
+# We have 3 zones - den, upstairs and office
+# We have 5 time periods - early_morning, morning, afternoon, evening, and overnight
+# We have 3 scenarios - WFH, weekend, at_work
+#
+# Whatever the scenario, evening and overnight are the same
+# Office only needs heat when WFH
+
+# First Set Up Timings
+binary_sensor:
+  # Early Morning
+  - platform: tod
+    name: TOD_EarlyMorning
+    after: "06:00"
+    before: "08:00"
+    unique_id: tod_earlymorning
+  # Morning
+  - platform: tod
+    name: TOD_Morning
+    after: "08:00"
+    before: "12:00"
+    unique_id: tod_morning
+  # Afternoon
+  - platform: tod
+    name: TOD_Afternoon
+    after: "12:00"
+    before: "16:00"
+    unique_id: tod_afternoon
+  # Evening
+  - platform: tod
+    name: TOD_Evening
+    after: "16:00"
+    before: "21:00"
+    unique_id: tod_evening
+  # Overnight
+  - platform: tod
+    name: TOD_Overnight
+    after: "21:00"
+    before: "06:00"
+    unique_id: tod_overnight
+
+input_number:
+  ###################### Away Temps
+
+  mc_heating_den_away:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Den Away Temperature"
+
+  mc_heating_office_away:
+    min: 60
+    max: 80
+    initial: 61
+    name: "Office Away Temperature"
+
+  ###################### Early Morning Start
+
+  mc_heating_temperature_early_morning_bedroom:
+    min: 60
+    max: 80
+    initial: 72
+    name: "Bedroom Early Morning Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_early_morning_den:
+    min: 60
+    max: 80
+    initial: 72
+    name: "Den Early Morning Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_early_morning_office:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Office Early Morning Temperature"
+    icon: mdi:thermometer
+
+  ###################### Morning Start
+
+  mc_heating_temperature_morning_bedroom:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Bedroom Morning Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_morning_den:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Den Morning Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_morning_office:
+    min: 60
+    max: 80
+    initial: 73
+    name: "Office Morning Temperature"
+    icon: mdi:thermometer
+
+    ###################### Afternoon Start
+
+  mc_heating_temperature_afternoon_bedroom:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Bedroom Afternoon Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_afternoon_den:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Den Afternoon Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_afternoon_office:
+    min: 60
+    max: 80
+    initial: 73
+    name: "Office Afternoon Temperature"
+    icon: mdi:thermometer
+
+  ###################### Evening Start
+
+  mc_heating_temperature_evening_bedroom:
+    min: 60
+    max: 80
+    initial: 71
+    name: "Bedroom Evening Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_evening_den:
+    min: 60
+    max: 80
+    initial: 72
+    name: "Den Evening Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_evening_office:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Office Evening Temperature"
+    icon: mdi:thermometer
+
+  ###################### Overnight Start
+
+  mc_heating_temperature_overnight_bedroom:
+    min: 60
+    max: 80
+    initial: 65
+    name: "Bedroom Overnight Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_overnight_den:
+    min: 60
+    max: 80
+    initial: 60
+    name: "Den Overnight Temperature"
+    icon: mdi:thermometer
+
+  mc_heating_temperature_overnight_office:
+    min: 60
+    max: 80
+    initial: 60
+    name: "Office Overnight Temperature"
+    icon: mdi:thermometer
+
+  ######################### Current Temps for UI
+
+  mc_target_temp_den:
+    min: 55
+    max: 80
+    initial: 65
+    name: "Target Temp - Den"
+    icon: mdi:thermometer
+
+  mc_target_temp_office:
+    min: 55
+    max: 80
+    initial: 65
+    name: "Target Temp - Office"
+    icon: mdi:thermometer
+
+  mc_target_temp_bedroom:
+    min: 55
+    max: 80
+    initial: 65
+    name: "Target Temp - Bedrooms"
+    icon: mdi:thermometer
+
+  ######################### Timings End
+
+input_boolean:
+  heating_timer_switch:
+    name: Heating timer enable
+    icon: mdi:fire
+
+  heating_override_switch:
+    name: Heating override
+    icon: mdi:fire
+
+###
+###  https://siytek.com/the-ultimate-home-assistant-diy-thermostat-guide-for-single-or-multiple-zone-heating/#Set-up-entities
+#### https://www.home-assistant.io/integrations/generic_thermostat/
+###
+climate:
+  - platform: generic_thermostat
+    name: mc_gen_th_den
+    heater: switch.sonoff_4ch_relay_1
+    target_sensor: sensor.average_temp_downstairs
+    target_temp: 60
+    ac_mode: false
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+    min_temp: 60
+    max_temp: 85
+    precision: 0.5
+    initial_hvac_mode: "off"
+
+  - platform: generic_thermostat
+    name: mc_gen_th_office
+    heater: switch.sonoff_4ch_relay_2
+    target_sensor: sensor.average_temp_office
+    target_temp: 60
+    ac_mode: false
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+    min_temp: 60
+    max_temp: 85
+    precision: 0.5
+    initial_hvac_mode: "off"
+
+  - platform: generic_thermostat
+    name: mc_gen_th_bedroom
+    heater: switch.sonoff_4ch_relay_3
+    target_sensor: sensor.average_temp_upstairs
+    target_temp: 60
+    ac_mode: false
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+    min_temp: 60
+    max_temp: 85
+    precision: 0.5
+    initial_hvac_mode: "off"
