@@ -77,7 +77,7 @@ flowchart LR
   t3(afternoon temp) -.-> brains
   t4(evening temp) -.-> brains
   t5(overnight temp) -.-> brains
-  id2(outside temp) --> brains
+  id2(outside temp) ---> brains
   brains(brains inside/outside) --> UI
   UI(Nest UI) --> Router
   Router(Router) --> c1 & c2 & c3 & c4
